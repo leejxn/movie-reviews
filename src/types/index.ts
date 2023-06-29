@@ -1,4 +1,4 @@
-export interface Movie {
+export interface MovieObject {
   id: string;
   reviews: number[];
   title: string;
@@ -8,5 +8,3 @@ export interface Movie {
   movieCompanyName?: string;
   averageReviewScore?: number;
 }
-
-export type MovieObject = Movie | {};

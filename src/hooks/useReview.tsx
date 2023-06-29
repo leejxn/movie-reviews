@@ -1,5 +1,12 @@
 import { useState } from 'react';
 
+interface RequestOptions {
+  method: string;
+  headers: Headers;
+  body?: any;
+  redirect?: RequestRedirect | undefined;
+}
+
 const useReview = () => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -12,11 +19,11 @@ const useReview = () => {
 
       const requestBody = JSON.stringify(review);
 
-      const requestOptions = {
+      const requestOptions: RequestOptions = {
         method: 'POST',
         headers: requestHeaders,
         body: requestBody,
-        redirect: 'follow',
+        redirect: 'follow', // Example value for redirect
       };
 
       fetch(

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Movie } from '../types';
+import { MovieObject } from '../types';
 
 interface MovieCompany {
   id: string;
@@ -14,7 +14,7 @@ const useMovies = () => {
   const [error, setError] = useState<React.ErrorInfo | null | unknown>(null);
 
   // Initiate movies state
-  const [movies, setMovies] = useState<Movie[]>([]);
+  const [movies, setMovies] = useState<MovieObject[]>([]);
 
   // Initiate movieCompanies state
   const [movieCompanies, setMovieCompanies] = useState<MovieCompany[]>();

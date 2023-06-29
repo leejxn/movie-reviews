@@ -101,9 +101,15 @@ const index = (props: ReviewFormProps) => {
         <Container>
           <MovieInfo>
             <h2>Write a review...</h2>
-            <span>Movie: {selectedMovie.title} </span>
-            <span>Movie Company: {selectedMovie.movieCompanyName} </span>
-            <span>Average Review: {selectedMovie.averageReviewScore} </span>
+            {selectedMovie.title ? (
+              <>
+                <span>Movie: {selectedMovie.title}</span>
+                <span>Movie Company: {selectedMovie.movieCompanyName}</span>
+                <span>Average Review: {selectedMovie.averageReviewScore}</span>
+              </>
+            ) : (
+              <span>No movie selected</span>
+            )}
           </MovieInfo>
           <div>
             <TextField
@@ -136,8 +142,7 @@ const index = (props: ReviewFormProps) => {
           </div>
         </Container>
       </DesktopView>
-
-      <StyledDialog open={selectedMovie.title} onClose={closeDialogHandler}>
+      <StyledDialog open={!!selectedMovie.title} onClose={closeDialogHandler}>
         <DialogTitle>{selectedMovie.title}</DialogTitle>
         <DialogContent>
           <DialogContentText>
