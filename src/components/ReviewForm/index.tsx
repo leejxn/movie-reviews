@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
 import styled from 'styled-components';
 import Container from '../shared/Container';
 import useReview from '../../hooks/useReview';
-import Modal from '@mui/material/Modal';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -23,6 +23,10 @@ const MovieInfo = styled.div`
     margin-top: -15px;
     margin-bottom: -5px;
   }
+`;
+
+const SuccessMessage = styled.span`
+  font-weight: 600;
 `;
 
 // Desktop view of the review form
@@ -47,6 +51,11 @@ const CharacterCount = styled.span`
   font-size: 12px;
 `;
 
+const ReviewError = styled.span`
+  font-weight: 600;
+  color: red;
+`;
+
 // Create a type interface for the props
 interface ReviewFormProps {
   // share movie interfact
@@ -59,7 +68,7 @@ const index = (props: ReviewFormProps) => {
   const { selectedMovie, setSelectedMovie } = props;
 
   // Get functions and variables from the useReview hook
-  const { submitReview, isLoading } = useReview();
+  const { submitReview, isLoading, reviewState, setReviewState } = useReview();
 
   // Initiate state for the character counterse
   const [characterCount, setCharacterCount] = useState<number>(0);
@@ -70,6 +79,11 @@ const index = (props: ReviewFormProps) => {
 
   // Initiate state to keep track if the mobile Dialog is open or not
   const [mobileDialogOpen, setMobileDialogOpen] = useState<boolean>(true);
+
+  // Run useEffect to make sure the review form is displayed when the user changes movie
+  useEffect(() => {
+    setReviewState(0);
+  }, [selectedMovie]);
 
   // Keeps track of the character length of the review
   const inputChangeHandler = (event: { target: { value: string } }) => {
@@ -111,35 +125,53 @@ const index = (props: ReviewFormProps) => {
               <span>No movie selected</span>
             )}
           </MovieInfo>
-          <div>
-            <TextField
-              id="outlined-multiline-static"
-              label="Movie Review"
-              multiline
-              fullWidth
-              rows={4}
-              onChange={inputChangeHandler}
-              error={characterCount > 100}
-            />
-          </div>
-          <div>
-            <CharacterCount
-              style={{ color: characterCount > 100 ? 'red' : 'inherit' }}
-            >
-              Character Count: {characterCount}/100
-            </CharacterCount>
-          </div>
-          <div>
-            <Button
-              variant="contained"
-              onClick={() => {
-                submitReviewHandler();
-              }}
-              disabled={characterCount > 100}
-            >
-              Submit
-            </Button>
-          </div>
+          {reviewState === 1 ? (
+            <SuccessMessage>Thanks for submitting a review!</SuccessMessage>
+          ) : (
+            <>
+              <div>
+                {reviewState === 2 && (
+                  <ReviewError>
+                    An error occurred, please try submitting your review again.
+                  </ReviewError>
+                )}
+                <TextField
+                  id="outlined-multiline-static"
+                  label="Movie Review"
+                  multiline
+                  fullWidth
+                  rows={4}
+                  onChange={inputChangeHandler}
+                  error={characterCount > 100}
+                  disabled={isLoading}
+                />
+              </div>
+              <div>
+                <CharacterCount
+                  style={{ color: characterCount > 100 ? 'red' : 'inherit' }}
+                >
+                  Character Count: {characterCount}/100
+                </CharacterCount>
+              </div>
+              <div>
+                {isLoading ? (
+                  <CircularProgress />
+                ) : (
+                  <div>
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        submitReviewHandler();
+                      }}
+                      disabled={characterCount > 100 || characterCount === 0}
+                    >
+                      Submit
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </Container>
       </DesktopView>
       <StyledDialog open={!!selectedMovie.title} onClose={closeDialogHandler}>
@@ -149,43 +181,61 @@ const index = (props: ReviewFormProps) => {
             {selectedMovie.movieCompanyName} -{' '}
             {selectedMovie.averageReviewScore} Stars
           </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="review"
-            label="Movie Review"
-            type="text"
-            fullWidth
-            variant="standard"
-            onChange={mobileInputChangeHandler}
-            error={mobileCharacterCount > 100}
-          />
-          <DialogContentText>
-            <CharacterCount
-              style={{
-                color: mobileCharacterCount > 100 ? 'red' : 'inherit',
-              }}
-            >
-              Character Count: {mobileCharacterCount}/100
-            </CharacterCount>
-          </DialogContentText>
         </DialogContent>
+        {reviewState === 1 ? (
+          <SuccessMessage>Thanks for submitting a review!</SuccessMessage>
+        ) : (
+          <DialogContent>
+            {reviewState === 2 && <ReviewError>Error - Try again.</ReviewError>}
+            <TextField
+              autoFocus
+              margin="dense"
+              id="review"
+              label="Movie Review"
+              type="text"
+              fullWidth
+              variant="standard"
+              onChange={mobileInputChangeHandler}
+              error={mobileCharacterCount > 100}
+              disabled={isLoading}
+            />
+            <DialogContentText>
+              <CharacterCount
+                style={{
+                  color: mobileCharacterCount > 100 ? 'red' : 'inherit',
+                }}
+              >
+                Character Count: {mobileCharacterCount}/100
+              </CharacterCount>
+            </DialogContentText>
+          </DialogContent>
+        )}
         <DialogActions>
-          <Button
-            onClick={() => {
-              closeDialogHandler();
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            disabled={mobileCharacterCount > 100}
-            onClick={() => {
-              submitReviewHandler();
-            }}
-          >
-            Submit
-          </Button>
+          {isLoading ? (
+            <CircularProgress size={25} />
+          ) : (
+            <>
+              <Button
+                onClick={() => {
+                  closeDialogHandler();
+                }}
+              >
+                Close
+              </Button>
+              <Button
+                disabled={
+                  mobileCharacterCount > 100 ||
+                  mobileCharacterCount === 0 ||
+                  reviewState === 1
+                }
+                onClick={() => {
+                  submitReviewHandler();
+                }}
+              >
+                Submit
+              </Button>
+            </>
+          )}
         </DialogActions>
       </StyledDialog>
     </>

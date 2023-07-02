@@ -10,27 +10,31 @@ interface RequestOptions {
 const useReview = () => {
   const [isLoading, setIsLoading] = useState(false);
 
+  const [reviewState, setReviewState] = useState(0);
+
   const submitReview = async (review: string) => {
+    setIsLoading(true);
+
+    const requestHeaders = new Headers();
+    requestHeaders.append('Content-Type', 'application/json');
+
+    const requestBody = { review: 'Great movie' };
+
+    const requestOptions: RequestOptions = {
+      method: 'POST',
+      headers: requestHeaders,
+      body: requestBody,
+    };
+
     try {
-      setIsLoading(true);
-
-      const requestHeaders = new Headers();
-      requestHeaders.append('Content-Type', 'application/json');
-
-      const requestBody = JSON.stringify(review);
-
-      const requestOptions: RequestOptions = {
-        method: 'POST',
-        headers: requestHeaders,
-        body: requestBody,
-        redirect: 'follow', // Example value for redirect
-      };
-
-      fetch(
+      const response = await fetch(
         'https://comforting-starlight-f3456a.netlify.app/.netlify/functions/submitReview',
         requestOptions
       );
+      const result = await response.text();
+      setReviewState(1);
     } catch (err) {
+      setReviewState(2);
       throw err;
     } finally {
       setIsLoading(false);
@@ -40,7 +44,9 @@ const useReview = () => {
   return {
     // Variables
     isLoading,
+    reviewState,
     // Methods
+    setReviewState,
     submitReview,
   };
 };
