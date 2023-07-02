@@ -9,6 +9,7 @@ export default function ErrorFallback({
 }: ErrorFallbackProps): JSX.Element {
   return (
     <Container>
+      <p>An error occured, please try again.</p>
       <p>{errorText}</p>
     </Container>
   );
