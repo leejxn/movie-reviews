@@ -1,0 +1,12 @@
+version: '2.15.1'
+services:
+  client: # Define the client service so we can run it in an isolated environment
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000' # Map the port 3000 to Docker
+    volumes:
+      - '/app/node_modules'
+      - './:/app'
