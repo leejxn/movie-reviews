@@ -19,52 +19,29 @@ const useMovies = () => {
   // Initiate movieCompanies state
   const [movieCompanies, setMovieCompanies] = useState<MovieCompany[]>();
 
-  const requestRetries = 5;
-
   const fetchMovieCompanies = async () => {
-    let retries = requestRetries;
-    // Retry the fetch X amount of times if it fails
-    while (retries > 0) {
-      try {
-        const response = await fetch(
-          'https://comforting-starlight-f3456a.netlify.app/.netlify/functions/movieCompanies'
-        );
-        const result = await response.json();
-        return result;
-      } catch (err) {
-        await sleepBetweenRetries(1000);
-      } finally {
-        retries -= 1;
-      }
-    }
-
-    function sleepBetweenRetries(delay: number) {
-      return new Promise((resolve) => setTimeout(resolve, delay));
+    try {
+      const response = await fetch(
+        'https://comforting-starlight-f3456a.netlify.app/.netlify/functions/movieCompanies'
+      );
+      const result = await response.json();
+      return result;
+    } catch (err) {
+      throw err;
     }
   };
 
   const fetchMovies = async () => {
-    let retries = requestRetries;
-    // Retry the fetch X amount of times if it fails
-    while (retries > 0) {
-      try {
-        const response = await fetch(
-          'https://comforting-starlight-f3456a.netlify.app/.netlify/functions/movies'
-        );
-        const result = await response.json();
-        return result;
-      } catch (err) {
-        await sleepBetweenRetries(1000);
-      } finally {
-        retries -= 1;
-      }
+    try {
+      const response = await fetch(
+        'https://comforting-starlight-f3456a.netlify.app/.netlify/functions/movies'
+      );
+      const result = await response.json();
+      return result;
+    } catch (err) {
+      throw err;
     }
   };
-
-  // Creates a delay between retries using a Promise that resolves after the specified delay using setTimeout.
-  function sleepBetweenRetries(delay: number) {
-    return new Promise((resolve) => setTimeout(resolve, delay));
-  }
 
   // This function loops through the movies object and gets the movie company name based on the filmCompanyId of each movie, it then adds that key/value pair to the movies object
   // This function also calculates the average review score and creates a key/value pair to store that too

@@ -6,7 +6,6 @@ import { MovieObject } from './types';
 
 export const App = () => {
   const [selectedMovie, setSelectedMovie] = useState<MovieObject | any>({});
-
   return (
     <div>
       <Introductuion />
