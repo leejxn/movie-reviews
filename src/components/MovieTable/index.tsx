@@ -109,13 +109,10 @@ const index = (props: MovieTableProps) => {
   };
 
   // If there is an error of somesort use the error fallback component
-  if (error) {
-    return (
-      <>
-        <ErrorFallback errorText={(error as Error).message} />
-      </>
-    );
-  }
+  // if (error) {
+  //   console.log(error);
+  //   return <ErrorFallback errorText={(error as Error).message} />;
+  // }
 
   return (
     <Container>
